@@ -24,7 +24,7 @@ Django==4.2.20
 django-cors-headers==4.7.0
 djangorestframework==3.16.0
 # Editable install with no version control (documentation==0.1.0)
--e d:\projects\knowledge extractor\mcp-server-example
+# -e d:\projects\knowledge extractor\mcp-server-example
 durationpy==0.10
 filelock==3.16.1
 flatbuffers==25.2.10

@@ -1,0 +1,14 @@
+ Final Instructions:
+
+
+   1. Start your backend: Open your PowerShell terminal in the D:\Projects\KnowledgeExtractor\backend directory
+       and run this command:
+      $env:PORT="3001"; $env:GCP_PROJECT_ID="gen-lang-client-0605568944"; $env:GCP_REGION="us-central1"; node
+  server.js
+
+
+   2. Open your prototype: In your web browser, go to the live URL:
+      https://gen-lang-client-0605568944.web.app
+
+
+  The application will be fully functional. You can now record a video or present it for your hackathon.

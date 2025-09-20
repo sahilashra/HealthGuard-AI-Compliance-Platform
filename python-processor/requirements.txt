@@ -1,0 +1,6 @@
+# python-processor/requirements.txt
+google-cloud-storage
+google-cloud-documentai
+google-generativeai
+pypdf
+python-dotenv

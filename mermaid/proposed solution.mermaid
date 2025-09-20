@@ -1,0 +1,7 @@
+flowchart TD
+    A[Document Upload - Google Cloud Storage] --> B[AI Processing - Document AI extracts text tables metadata]
+    B --> C[Compliance Search - Vertex AI Search retrieves relevant regulations]
+    C --> D[Test Generation - Gemini Pro creates compliant test cases with citations]
+    D --> E[Human Review - SME approval with edit capabilities]
+    E --> F[ALM Export - Batch creation in Jira Polarion Azure DevOps]
+    F --> G[Evidence Archive - Complete audit trail stored in BigQuery]
