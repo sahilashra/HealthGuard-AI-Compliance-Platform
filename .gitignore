@@ -42,4 +42,17 @@ package-lock.json
 # Frontend
 frontend/node_modules
 frontend/.next
-.gemini/ 
+.gemini/
+
+# Internal planning docs
+.local/
+*_ACTION_PLAN.md
+*_STRATEGY.md
+*_EXECUTION_PLAN.md
+*_DEPLOYMENT*.md
+Screenshot*.png
+
+# Backup files
+*.backup*
+*-fixed.*
+*.ps1 
