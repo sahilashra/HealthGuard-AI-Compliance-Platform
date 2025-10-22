@@ -5,6 +5,7 @@
 [![Live Demo](https://img.shields.io/badge/🚀%20Live%20Demo-Try%20Now-blue?style=for-the-badge)](https://healthguard-ai-hackathon.web.app)
 [![Powered by Google Cloud](https://img.shields.io/badge/Google%20Cloud-Platform-4285F4?style=for-the-badge&logo=google-cloud)](https://cloud.google.com)
 [![Google Gemini AI](https://img.shields.io/badge/Google%20Gemini-2.0%20Flash-orange?style=for-the-badge)](https://ai.google.dev/)
+[![Recording](https://img.shields.io/badge/Demo%20Video-Watch%20Now-red?style=for-the-badge)](https://drive.google.com/file/d/1nJqamwmVMPgGMb4rhE7WVV2kOPKJP-uF/view?usp=sharing)
 
 > **🎯 Production-Ready Platform** | **☁️ Fully Deployed on Google Cloud** | **🤖 Powered by Gemini AI**
 
