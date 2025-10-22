@@ -21,6 +21,11 @@ In the healthcare industry, ensuring that software meets strict regulatory stand
 This manual bottleneck delays the release of life-saving medical technology and stifles innovation.
 
 ---
+## Screenshot
+
+![img.png](img.png)
+
+---
 
 ## ✨ Our Solution: From 40 Hours to 40 Seconds
 
