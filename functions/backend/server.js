@@ -15,6 +15,7 @@ const documentParser = require('./services/documentParser');
 const geminiService = require('./services/geminiService');
 const jiraService = require('./services/jiraService');
 const sseManager = require('./services/sseManager');
+const { logExportEvent, getExportEvents } = require('./bigqueryManager');
 
 const app = express();
 
@@ -354,6 +355,29 @@ app.get('/process', async (req, res) => {
     docData.analysisResult = analysisResult;
     processedDocuments.set(fileId, docData);
 
+    // Log to BigQuery for audit trail
+    try {
+      await logExportEvent({
+        jobId: fileId,
+        eventType: 'ANALYSIS_COMPLETE',
+        documentName: docData.fileName,
+        complianceScore: analysisResult.compliance_score || 0,
+        testCaseCount: analysisResult.test_cases?.length || 0,
+        violationCount: analysisResult.violations?.length || 0,
+        riskLevel: analysisResult.risk_level || 'UNKNOWN',
+        status: 'SUCCESS',
+        metadata: {
+          wordCount: docData.metadata.wordCount,
+          textLength: docData.metadata.textLength,
+          uploadedAt: docData.uploadedAt
+        }
+      });
+      console.log('Audit event logged to BigQuery');
+    } catch (bqError) {
+      console.error('Failed to log to BigQuery:', bqError.message);
+      // Don't fail the request if BigQuery logging fails
+    }
+
     stream.send({
       status: 'complete',
       message: 'Analysis complete',
@@ -375,6 +399,30 @@ app.get('/process', async (req, res) => {
 
   } catch (error) {
     console.error('Process error:', error);
+
+    // Log error to BigQuery
+    try {
+      const fileId = req.query.fileId;
+      const docData = processedDocuments.get(fileId);
+
+      await logExportEvent({
+        jobId: fileId || 'unknown',
+        eventType: 'ANALYSIS_FAILED',
+        documentName: docData?.fileName || 'unknown',
+        complianceScore: 0,
+        testCaseCount: 0,
+        violationCount: 0,
+        riskLevel: 'ERROR',
+        status: 'FAILED',
+        metadata: {
+          error: error.message,
+          stack: error.stack
+        }
+      });
+    } catch (bqError) {
+      console.error('Failed to log error to BigQuery:', bqError.message);
+    }
+
     try {
       const stream = sseManager.createSimpleStream(res);
       stream.send({
@@ -549,6 +597,35 @@ app.get('/document/:fileId', (req, res) => {
   });
 });
 
+/**
+ * GET /audit-logs/:jobId
+ * Get BigQuery audit logs for a specific job
+ */
+app.get('/audit-logs/:jobId', async (req, res) => {
+  try {
+    const { jobId } = req.params;
+
+    console.log(`Fetching audit logs for jobId: ${jobId}`);
+
+    const events = await getExportEvents(jobId);
+
+    res.json({
+      success: true,
+      jobId: jobId,
+      eventCount: events.length,
+      events: events
+    });
+
+  } catch (error) {
+    console.error('Error fetching audit logs:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch audit logs',
+      message: error.message
+    });
+  }
+});
+
 // --- Error Handler ---
 app.use((error, req, res, next) => {
   console.error('❌ Unhandled Express Error:', error);
@@ -589,6 +666,7 @@ if (require.main === module) {
     console.log('  GET    /export-status/:jobId - Get Jira export status');
     console.log('  GET    /documents        - List all documents');
     console.log('  GET    /document/:fileId - Get document details');
+    console.log('  GET    /audit-logs/:jobId - Get BigQuery audit logs');
     console.log('  GET    /health           - Health check');
     console.log('=================================');
 
