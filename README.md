@@ -62,15 +62,6 @@ Interactive chat assistant that:
 - Provides regulatory guidance
 - Suggests remediation strategies
 
-#### 📊 BigQuery Audit Trail
-Complete audit logging for compliance tracking and reporting:
-- Automatic event logging to BigQuery for every analysis
-- Tracks compliance scores, violations, test cases, and risk levels
-- Queryable audit logs via REST API endpoint (`GET /audit-logs/:jobId`)
-- Real-time compliance dashboards and reporting
-- Immutable audit records for regulatory requirements
-- Full traceability for FDA, HIPAA, and ISO audits
-
 #### 🔗 Seamless Integration
 - **One-click Jira export:** Export test cases to Jira in batches with real-time progress tracking
 - **Evidence bundle download:** Generate audit-ready documentation
@@ -98,7 +89,6 @@ HealthGuard AI showcases the power of **Google's AI and Cloud ecosystem** - a fu
 | **🔥 Firebase Hosting** | Fast, global CDN for frontend application |
 | **⚙️ Google Cloud Build** | CI/CD pipeline for automated deployments |
 | **📊 Google Cloud Logging** | Application monitoring and error tracking |
-| **📊 Google BigQuery** | Audit trail and compliance event logging with real-time analytics |
 
 > **100% Google-powered** - From AI to infrastructure, every component runs on Google Cloud
 
@@ -120,14 +110,9 @@ HealthGuard AI showcases the power of **Google's AI and Cloud ecosystem** - a fu
 │         │            │   Storage    │               │      │
 │         │            └──────────────┘               │      │
 │         │                     │                     │      │
-│         │                     ▼                     │      │
-│         │            ┌──────────────┐               │      │
-│         │            │   BigQuery   │◀──────────────┘      │
-│         │            │ Audit Trail  │                      │
-│         │            └──────────────┘                      │
-│         │                                                  │
-│         └─────────────────────────────────────────────────┘│
+│         └─────────────────────┴─────────────────────┘      │
 │                    SSE Real-time Updates                    │
+│                                                             │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -231,12 +216,8 @@ npm run dev
 
 See `.env.example` for required environment variables. Key variables:
 - `GOOGLE_CLOUD_PROJECT` - Your GCP project ID
-- `GCP_PROJECT_NUMBER` - Your GCP project number (required for BigQuery Data Plane)
 - `GEMINI_API_KEY` - Google Gemini API key
-- `GOOGLE_APPLICATION_CREDENTIALS` - Path to service account JSON
 - `JIRA_API_TOKEN` - Jira API token for export functionality
-- `JIRA_BASE_URL` - Your Jira instance URL
-- `JIRA_PROJECT_KEY` - Jira project key for test case export
 
 ---
 
@@ -305,78 +286,6 @@ Use the AI Compliance Copilot chat assistant to:
 
 ---
 
-## 🔒 Security & Compliance
-
-### Audit Trail & Traceability
-Every compliance analysis is automatically logged to Google BigQuery with complete traceability:
-- **Event Tracking**: Timestamp, job ID, and event type for every analysis
-- **Compliance Metrics**: Score, violation count, test case count, and risk level
-- **Status Monitoring**: Success/failure tracking with detailed error logging
-- **Metadata Storage**: Full context preservation as JSON for deep analysis
-- **Audit API**: REST endpoint for programmatic access to audit logs
-- **Query Capabilities**: SQL-based analytics for compliance reporting
-
-### Data Security & Privacy
-- ✅ Sensitive files excluded from version control (.gitignore configured)
-- ✅ Service account keys managed via Google Cloud Secret Manager
-- ✅ Encrypted data at rest and in transit (Google Cloud default)
-- ✅ No sensitive data in git history (verified and cleaned)
-- ✅ HIPAA-compliant infrastructure on Google Cloud
-- ✅ Automatic security updates via Cloud Run
-
-### Regulatory Compliance
-- **FDA 21 CFR Part 11**: Electronic records with audit trails
-- **HIPAA**: Secure PHI handling and access logging
-- **ISO 13485**: Quality management system documentation
-- **SOC 2**: Security and availability controls via Google Cloud
-
----
-
-## 🏗️ Technical Architecture Deep Dive
-
-### Backend API Endpoints
-```
-POST   /upload           - Upload and analyze compliance documents
-GET    /process          - Process document with SSE streaming
-POST   /export-to-jira   - Export test cases to Jira
-GET    /export-status/:jobId - Get Jira export status
-GET    /audit-logs/:jobId - Retrieve audit logs for specific analysis
-GET    /documents        - List all processed documents
-GET    /document/:fileId - Get document details
-GET    /health           - Service health check
-```
-
-### BigQuery Schema
-**Table**: `exports.provider_results`
-- `timestamp` (TIMESTAMP) - Event occurrence time
-- `job_id` (STRING) - Unique analysis identifier
-- `event_type` (STRING) - ANALYSIS_COMPLETE, ANALYSIS_FAILED, etc.
-- `user_id` (STRING) - User identifier (optional)
-- `document_name` (STRING) - Source document name
-- `compliance_score` (INTEGER) - 0-100 compliance rating
-- `test_case_count` (INTEGER) - Generated test cases
-- `violation_count` (INTEGER) - Detected violations
-- `risk_level` (STRING) - LOW, MEDIUM, HIGH, CRITICAL
-- `status` (STRING) - SUCCESS, FAILED
-- `metadata` (JSON) - Additional context and details
-
-### Data Flow
-1. **Document Upload** → Cloud Storage (secure, versioned)
-2. **AI Processing** → Gemini 2.0 Flash analyzes requirements
-3. **Result Generation** → Structured compliance report
-4. **Audit Logging** → BigQuery records all events
-5. **Real-time Updates** → SSE streams to frontend
-6. **Export** → Jira API integration for test cases
-
-### Performance Optimizations
-- **OAuth Token Caching**: Reduces API calls to BigQuery
-- **Direct REST API**: Bypasses library bugs for reliability
-- **Streaming Responses**: Server-Sent Events for real-time updates
-- **Auto-scaling**: Cloud Run handles 0-1000+ concurrent requests
-- **CDN Edge Caching**: Firebase Hosting for <100ms global latency
-
----
-
 ## 💡 Why Google Cloud Platform?
 
 We chose Google Cloud as our foundation for several strategic reasons:
@@ -420,9 +329,6 @@ We chose Google Cloud as our foundation for several strategic reasons:
 - ✅ Test case generation
 - ✅ Jira export with batch processing
 - ✅ AI Compliance Copilot
-- ✅ BigQuery audit trail and event logging
-- ✅ Audit logs REST API endpoint
-- ✅ Security hardening and git cleanup
 
 ### Phase 2: Enhanced Features (In Progress)
 - [ ] Support for additional regulations (GDPR, SOX, FDA 510(k))
