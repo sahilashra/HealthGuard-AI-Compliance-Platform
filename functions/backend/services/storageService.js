@@ -11,7 +11,7 @@ const storage = new Storage({
   projectId: process.env.GCP_PROJECT_ID
 });
 
-const BUCKET_NAME = `${process.env.BUCKET_PREFIX}-uploads` || 'healthguard-ai-hackathon-uploads';
+const BUCKET_NAME = process.env.BUCKET_PREFIX ? `${process.env.BUCKET_PREFIX}-uploads` : 'healthguard-ai-hackathon-uploads';
 
 /**
  * Ensure the bucket exists, create if it doesn't
