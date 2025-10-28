@@ -135,15 +135,42 @@ RULES:
     });
 
     console.log('Sending request to Gemini AI...');
-    const result = await model.generateContent(analysisPrompt);
-    const response = await result.response;
-    const responseText = response.text();
 
-    console.log('Received response from Gemini AI');
+    // Start progress updates to keep user engaged during long analysis
+    const progressMessages = [
+      { delay: 5000, message: 'Analyzing HIPAA compliance requirements...' },
+      { delay: 15000, message: 'Checking FDA 21 CFR Part 11 regulations...' },
+      { delay: 30000, message: 'Evaluating ISO 13485 & ISO 9001 standards...' },
+      { delay: 45000, message: 'Assessing GDPR data protection compliance...' },
+      { delay: 60000, message: 'Identifying compliance gaps and risks...' },
+      { delay: 75000, message: 'Generating comprehensive test cases...' },
+      { delay: 90000, message: 'Building traceability matrix...' },
+      { delay: 105000, message: 'Almost done, finalizing analysis...' }
+    ];
 
+    const progressTimers = [];
     if (updateCallback) {
-      updateCallback({ status: 'inprogress', message: 'Parsing AI response...' });
+      progressMessages.forEach(({ delay, message }) => {
+        const timer = setTimeout(() => {
+          updateCallback({ status: 'inprogress', message });
+        }, delay);
+        progressTimers.push(timer);
+      });
     }
+
+    try {
+      const result = await model.generateContent(analysisPrompt);
+      const response = await result.response;
+      const responseText = response.text();
+
+      // Clear all progress timers
+      progressTimers.forEach(timer => clearTimeout(timer));
+
+      console.log('Received response from Gemini AI');
+
+      if (updateCallback) {
+        updateCallback({ status: 'inprogress', message: 'Parsing AI response...' });
+      }
 
     // Parse the JSON response
     let analysisResult;
@@ -180,6 +207,12 @@ RULES:
       success: true,
       ...analysisResult
     };
+
+    } catch (innerError) {
+      // Clear progress timers on error
+      progressTimers.forEach(timer => clearTimeout(timer));
+      throw innerError;
+    }
 
   } catch (error) {
     console.error('Error in Gemini compliance analysis:', error);
