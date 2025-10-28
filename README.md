@@ -39,13 +39,16 @@ Our platform provides a seamless web interface where users can upload their soft
 #### 🤖 Smart Compliance Scoring
 Instantly analyzes documents and provides a clear **Compliance Score (0-100%)** with risk-level assessment (Low, Medium, High, Critical).
 
-#### 🚨 Real-time Violation Detection
-Automatically flags potential violations of key healthcare standards:
+#### 🚨 Multi-Standard Compliance Detection
+Automatically flags potential violations across multiple regulatory frameworks:
 - **HIPAA** (Privacy & Security Rules)
 - **FDA 21 CFR Part 11** (Electronic Records & Signatures)
 - **ISO 13485** (Medical Devices Quality Management)
+- **ISO 9001** (Quality Management Systems)
+- **ISO 27001** (Information Security Management)
+- **GDPR** (Data Protection & Privacy)
 
-Each violation includes AI-powered suggestions for remediation.
+Each violation includes AI-powered suggestions for remediation and full traceability.
 
 #### 🧪 AI-Powered Test Case Generation
 Generates a complete suite of high-quality, compliance-aware test cases directly from requirements, including:
@@ -55,17 +58,28 @@ Generates a complete suite of high-quality, compliance-aware test cases directly
 - Regulatory traceability mapping
 - Priority and risk assessment
 
+#### 📈 Intelligent Gap Analysis
+AI-powered feature gap analysis that identifies:
+- **Missing compliance requirements** across all standards
+- **Coverage gaps** in test case generation
+- **Risk areas** that need additional attention
+- **Prioritized recommendations** for achieving full compliance
+- **Traceability matrix** showing requirement-to-test mapping
+
 #### 💬 AI Compliance Copilot
-Interactive chat assistant that:
+Interactive chat assistant with feedback loop that:
 - Answers compliance questions in real-time
 - Explains violations in plain language
 - Provides regulatory guidance
 - Suggests remediation strategies
+- Enables iterative refinement of analysis and test cases
 
-#### 🔗 Seamless Integration
-- **One-click Jira export:** Export test cases to Jira in batches with real-time progress tracking
+#### 🔗 Seamless ALM Integration
+- **Jira Integration:** One-click export of test cases with real-time batch processing
+- **Traceability Support:** Export with full requirement-to-test traceability
 - **Evidence bundle download:** Generate audit-ready documentation
 - **Real-time streaming:** Server-Sent Events (SSE) for live progress updates
+- **API-Ready:** RESTful API for integration with Polarion, Azure DevOps, and other ALM tools
 
 #### 📊 Executive Summary & Metrics
 - Before/After comparison showing time and cost savings
@@ -94,26 +108,53 @@ HealthGuard AI showcases the power of **Google's AI and Cloud ecosystem** - a fu
 
 ### System Architecture
 
+**AI-Powered Test Generation & Gap Analysis Flow**
+
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                    GOOGLE CLOUD PLATFORM                    │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│  ┌─────────────┐      ┌──────────────┐      ┌───────────┐ │
-│  │   Frontend  │─────▶│  Cloud Run   │─────▶│  Gemini   │ │
-│  │  (Firebase) │      │  Backend API │      │  2.0 AI   │ │
-│  └─────────────┘      └──────────────┘      └───────────┘ │
-│         │                     │                     │      │
-│         │                     ▼                     │      │
-│         │            ┌──────────────┐               │      │
-│         │            │    Cloud     │               │      │
-│         │            │   Storage    │               │      │
-│         │            └──────────────┘               │      │
-│         │                     │                     │      │
-│         └─────────────────────┴─────────────────────┘      │
-│                    SSE Real-time Updates                    │
-│                                                             │
-└─────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────────┐
+│                         GOOGLE CLOUD PLATFORM                            │
+├──────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│  ┌─────────────┐    ┌─────────────────┐    ┌──────────────────────┐   │
+│  │   Upload    │───▶│  Create Context │───▶│  Build & Store       │   │
+│  │ Requirements│    │   (Gemini AI)   │    │  Context (GCS)       │   │
+│  │  Document   │    │                 │    │                      │   │
+│  └─────────────┘    └─────────────────┘    └──────────────────────┘   │
+│                              │                        │                 │
+│                              │                        ▼                 │
+│  ┌─────────────┐    ┌────────▼──────────┐   ┌──────────────────────┐  │
+│  │   Export    │◀───│  Generate Test    │◀──│  Compliance Analysis │  │
+│  │   to Jira   │    │   Cases (AI)      │   │   (Gemini AI)        │  │
+│  └─────────────┘    └───────────────────┘   └──────────────────────┘  │
+│         ▲                    │                         │                │
+│         │                    ▼                         ▼                │
+│         │           ┌─────────────────┐      ┌─────────────────┐      │
+│         │           │  Feature Gap    │      │   Violation     │      │
+│         │           │  Analysis (AI)  │      │   Detection     │      │
+│         │           └─────────────────┘      └─────────────────┘      │
+│         │                    │                         │               │
+│         │                    └────────┬────────────────┘               │
+│         │                             ▼                                │
+│         │                    ┌─────────────────┐                       │
+│         └────────────────────│  User Feedback  │                       │
+│                              │  & Refinement   │                       │
+│                              │ (AI Copilot)    │                       │
+│                              └─────────────────┘                       │
+│                                      │                                 │
+│                                      │ (Feedback Loop)                 │
+│                                      └──────────────────┐              │
+│                                                         ▼              │
+│                              ┌──────────────────────────────┐          │
+│                              │   Update Context & Reprocess │          │
+│                              └──────────────────────────────┘          │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+
+Key AI Components:
+🤖 Gemini 2.0 Flash: Context creation, analysis, test generation
+📊 Gap Analysis: Identifies missing compliance requirements
+🔄 Feedback Loop: Interactive refinement via AI Copilot
+📦 Context Storage: Cloud Storage for persistent context
 ```
 
 ### Technology Stack

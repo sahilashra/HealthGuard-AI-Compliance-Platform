@@ -362,9 +362,11 @@ app.get('/process', async (req, res) => {
         compliance_score: analysisResult.compliance_score,
         risk_level: analysisResult.risk_level,
         violations: analysisResult.violations,
+        gap_analysis: analysisResult.gap_analysis,
         executive_summary: analysisResult.executive_summary,
         test_case_count: analysisResult.test_cases?.length || 0,
-        violation_count: analysisResult.violations?.length || 0
+        violation_count: analysisResult.violations?.length || 0,
+        gap_count: analysisResult.gap_count || 0
       },
       results: analysisResult.test_cases || []
     });

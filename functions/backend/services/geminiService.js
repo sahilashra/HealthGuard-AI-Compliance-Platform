@@ -37,9 +37,9 @@ async function analyzeCompliance(documentText, updateCallback = null) {
 
     // Create the analysis prompt
     const analysisPrompt = `
-You are a healthcare software compliance expert specializing in FDA, HIPAA, and ISO 13485 regulations.
+You are a healthcare software compliance expert specializing in FDA, HIPAA, ISO 13485, ISO 9001, ISO 27001, and GDPR regulations.
 
-TASK: Analyze the following software requirements document for compliance with healthcare regulations.
+TASK: Analyze the following software requirements document for compliance with healthcare regulations and identify gaps.
 
 REQUIREMENTS DOCUMENT:
 ${documentText.substring(0, 50000)}
@@ -55,10 +55,43 @@ OUTPUT FORMAT (JSON):
     {
       "type": "regulation name",
       "description": "detailed description",
-      "suggestion": "how to fix it"
+      "suggestion": "how to fix it",
+      "severity": "<LOW|MEDIUM|HIGH|CRITICAL>"
     }
   ],
-  "executive_summary": "brief summary of compliance status",
+  "gap_analysis": {
+    "missing_requirements": [
+      {
+        "standard": "regulation name (e.g., HIPAA, FDA, ISO 13485, ISO 9001, ISO 27001, GDPR)",
+        "requirement": "specific requirement missing",
+        "priority": "<LOW|MEDIUM|HIGH|CRITICAL>",
+        "recommendation": "what needs to be added"
+      }
+    ],
+    "coverage_gaps": [
+      {
+        "area": "area of system (e.g., data encryption, audit trails)",
+        "current_coverage": "<percentage or description>",
+        "target_coverage": "what should be covered",
+        "action_items": ["specific actions to close gap"]
+      }
+    ],
+    "risk_areas": [
+      {
+        "area": "risk area name",
+        "description": "detailed risk description",
+        "impact": "<LOW|MEDIUM|HIGH|CRITICAL>",
+        "mitigation": "recommended mitigation strategy"
+      }
+    ],
+    "traceability_matrix": {
+      "requirements_count": <number>,
+      "test_cases_count": <number>,
+      "coverage_percentage": <0-100>,
+      "untested_requirements": ["REQ-XXX", "REQ-YYY"]
+    }
+  },
+  "executive_summary": "brief summary of compliance status and key gaps",
   "test_cases": [
     {
       "test_case_id": "TC-XXX",
@@ -77,14 +110,17 @@ OUTPUT FORMAT (JSON):
 }
 
 RULES:
-1. Be thorough and identify ALL potential violations
+1. Be thorough and identify ALL potential violations across HIPAA, FDA, ISO 13485, ISO 9001, ISO 27001, and GDPR
 2. Provide actionable suggestions for each violation
 3. Generate comprehensive test cases that verify compliance
-4. Link each test case to specific requirements and regulations
-5. Risk level: HIGH if FDA Class III or critical HIPAA violations found
-6. Generate at least 20-50 test cases for a typical document
-7. Use JSON format exactly as specified above
-8. IMPORTANT: Return ONLY valid JSON, no markdown formatting, no explanations outside the JSON
+4. Conduct detailed gap analysis identifying missing requirements, coverage gaps, and risk areas
+5. Create traceability matrix showing requirement-to-test mapping
+6. Link each test case to specific requirements and regulations
+7. Risk level: HIGH if FDA Class III or critical HIPAA violations found
+8. Generate at least 20-50 test cases for a typical document
+9. Prioritize gaps and recommendations by criticality
+10. Use JSON format exactly as specified above
+11. IMPORTANT: Return ONLY valid JSON, no markdown formatting, no explanations outside the JSON
 `;
 
     const model = genAI.getGenerativeModel({
@@ -162,6 +198,17 @@ function validateAndEnhanceResponse(response) {
     compliance_score: response.compliance_score || 0,
     risk_level: response.risk_level || 'MEDIUM',
     violations: response.violations || [],
+    gap_analysis: response.gap_analysis || {
+      missing_requirements: [],
+      coverage_gaps: [],
+      risk_areas: [],
+      traceability_matrix: {
+        requirements_count: 0,
+        test_cases_count: 0,
+        coverage_percentage: 0,
+        untested_requirements: []
+      }
+    },
     executive_summary: response.executive_summary || 'Compliance analysis completed.',
     test_cases: response.test_cases || [],
     results: response.test_cases || [] // Alias for frontend compatibility
@@ -176,6 +223,12 @@ function validateAndEnhanceResponse(response) {
     validated.risk_level = determineRiskLevel(validated.violations);
   }
 
+  // Ensure violations have severity
+  validated.violations = validated.violations.map(v => ({
+    ...v,
+    severity: v.severity || 'MEDIUM'
+  }));
+
   // Ensure test cases have required fields
   validated.test_cases = validated.test_cases.map((tc, index) => ({
     test_case_id: tc.test_case_id || `TC-${String(index + 1).padStart(3, '0')}`,
@@ -189,10 +242,21 @@ function validateAndEnhanceResponse(response) {
 
   validated.results = validated.test_cases;
 
+  // Update traceability matrix with actual counts
+  validated.gap_analysis.traceability_matrix.test_cases_count = validated.test_cases.length;
+  if (validated.gap_analysis.traceability_matrix.requirements_count > 0) {
+    validated.gap_analysis.traceability_matrix.coverage_percentage = Math.round(
+      (validated.test_cases.length / validated.gap_analysis.traceability_matrix.requirements_count) * 100
+    );
+  }
+
   // Add metadata
   validated.analyzed_at = new Date().toISOString();
   validated.test_case_count = validated.test_cases.length;
   validated.violation_count = validated.violations.length;
+  validated.gap_count = (validated.gap_analysis.missing_requirements?.length || 0) +
+                       (validated.gap_analysis.coverage_gaps?.length || 0) +
+                       (validated.gap_analysis.risk_areas?.length || 0);
 
   return validated;
 }
